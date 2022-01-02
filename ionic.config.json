@@ -1,0 +1,7 @@
+{
+  "name": "nbac",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
