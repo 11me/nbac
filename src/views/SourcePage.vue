@@ -15,6 +15,8 @@
       </ion-grid>
     </ion-item>
     <ion-content :fullscreen="false">
+      <p :key="source.index" v-for="source in inDb">{{ source.name }}<ion-toggle></ion-toggle></p>
+      <h1>Please turn on notifications  in settings</h1>
     </ion-content>
   </ion-page>
 </template>
@@ -28,6 +30,7 @@ import { IonContent,
          IonGrid,
          IonRow,
          IonItem,
+         IonToggle,
          IonButton} from '@ionic/vue';
 import { defineComponent } from 'vue';
 import { Capacitor } from '@capacitor/core';
@@ -36,7 +39,7 @@ import { isRSS } from '@/services/helpers';
 import { rocket } from 'ionicons/icons';
 import { HTMLParser, sources, Options } from '@11me/xparse';
 import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
-
+import inDbSources from '@/services/db';
 
 export default defineComponent({
   components: {
@@ -45,59 +48,30 @@ export default defineComponent({
     IonCol,
     IonGrid,
     IonRow,
+    IonToggle,
     IonItem,
     IonInput,
     IonButton
   },
-  data() {
-    return {
-      sourceUrl: '',
-      inDbSources: []
-    }
-  },
-  async created() {
-    const platform = Capacitor.getPlatform();
-    const sqlite: SQLiteConnection = new SQLiteConnection(CapacitorSQLite);
+  setup() {
+    let sourceUrl = ''
 
-    if(platform === "web") {
-      // Create the 'jeep-sqlite' Stencil component
-      const jeepSqlite = document.createElement('jeep-sqlite');
-      document.body.appendChild(jeepSqlite);
-      await customElements.whenDefined('jeep-sqlite');
-      // Initialize the Web store
-      await sqlite.initWebStore();
-    }
-    // example: database creation with standard SQLite statements
-    const ret = await sqlite.checkConnectionsConsistency();
-    const isConn = (await sqlite.isConnection("db_tab3SQLite")).result;
-    let db: SQLiteDBConnection
-    if (ret.result && isConn) {
-      db = await sqlite.retrieveConnection("db_tab3SQLite");
-    } else {
-      db = await sqlite.createConnection("db_tab3SQLite", false, "no-encryption", 1);
-    }
-    await db.open();
+    function addSource() {
 
-    const query = `
-    CREATE TABLE IF NOT EXISTS test (
-      id INTEGER PRIMARY KEY NOT NULL,
-      name TEXT NOT NULL
-    );
-    `
-    const res = await db.execute(query);
-    // const change = await db.execute('INSERT INTO test (id, name) VALUES (12, \'sa\')');
-    const data = await db.query('SELECT * FROM test');
-    await sqlite.closeConnection("db_tab3SQLite");
-  },
-  methods: {
-    addSource() {
-      if (isRSS(this.sourceUrl)) {
+      if (isRSS(sourceUrl)) {
         console.log('get req')
         console.log('is valid source (check headers)')
         console.log('insert to DB')
       } else {
         console.log('not')
       }
+    }
+
+    let inDb = inDbSources;
+    return {
+      sourceUrl,
+      inDb,
+      addSource
     }
   }
 });
