@@ -1,8 +1,7 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
-import HomePage from '../views/HomePage.vue';
-import FeedsPage from '../views/FeedsPage.vue';
-import OnBoard from '../views/OnBoard.vue';
+import HomePage from '../views/HomePage.vue'
+import SourcePage from '../views/SourcePage.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -15,14 +14,9 @@ const routes: Array<RouteRecordRaw> = [
     component: HomePage
   },
   {
-    path: '/feeds',
-    name: 'Feeds',
-    component: FeedsPage
-  },
-  {
-    path: '/onboard',
-    name: 'OnBoard',
-    component: OnBoard
+    path: '/source',
+    name: 'SourcePage',
+    component: SourcePage
   }
 ]
 
