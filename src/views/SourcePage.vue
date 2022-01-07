@@ -15,9 +15,12 @@
       </ion-grid>
     </ion-item>
     <ion-content :fullscreen="false">
-      <p :key="source.index" v-for="source in inDb">{{ source.name }}<ion-toggle></ion-toggle></p>
-      <h1>Please turn on notifications  in settings</h1>
+      <p :key="source.index" v-for="source in inDb">
+        {{ source.name }}
+        <ion-toggle :checked="source.notifications"></ion-toggle>
+      </p>
     </ion-content>
+    <h1>Please turn on notifications  in settings</h1>
   </ion-page>
 </template>
 
@@ -33,13 +36,11 @@ import { IonContent,
          IonToggle,
          IonButton} from '@ionic/vue';
 import { defineComponent } from 'vue';
-import { Capacitor } from '@capacitor/core';
-import Test from '@/types/sources';
 import { isRSS } from '@/services/helpers';
 import { rocket } from 'ionicons/icons';
 import { HTMLParser, sources, Options } from '@11me/xparse';
-import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
-import inDbSources from '@/services/db';
+
+import session from '@/main';
 
 export default defineComponent({
   components: {
@@ -53,25 +54,38 @@ export default defineComponent({
     IonInput,
     IonButton
   },
-  setup() {
-    let sourceUrl = ''
+  data() {
+    return {
+      inDb: [] as never[],
+      sourceUrl: ''
+    }
+  },
+  async created() {
+    this.inDb = await session.query('SELECT * FROM trd_sources')
+  },
+  methods: {
 
-    function addSource() {
-
-      if (isRSS(sourceUrl)) {
-        console.log('get req')
-        console.log('is valid source (check headers)')
-        console.log('insert to DB')
+    async addSource() {
+      let options = {
+        name: 'vcru',
+        url: 'vc.ru',
+        state: 1,
+        notifications: 0,
+        last_update: 100000
+      }
+      if (isRSS(this.sourceUrl)) {
+        let query = `
+          INSERT INTO
+            trd_sources (name, url, state, notifications, last_update)
+          VALUES (
+            '${options.name}', '${options.url}', ${options.state},
+            ${options.notifications}, ${options.last_update}
+          )`
+        await session.execute(query);
+        this.inDb = await session.query('SELECT * FROM trd_sources');
       } else {
         console.log('not')
       }
-    }
-
-    let inDb = inDbSources;
-    return {
-      sourceUrl,
-      inDb,
-      addSource
     }
   }
 });
