@@ -28,7 +28,7 @@
 
           <ion-col size="3" class="source-name-container">
             <div class="">
-              <ion-toggle :checked="source.notifications"></ion-toggle>
+              <ion-toggle @ionChange="changeNotifications($event, source.id)" :checked="source.notifications"></ion-toggle>
             </div>
           </ion-col>
 
@@ -87,6 +87,14 @@ import { defineComponent } from 'vue';
     this.inDb = await session.query('SELECT * FROM trd_sources')
   },
   methods: {
+    async changeNotifications(change: any, sourceId: number) {
+       if (change.detail.checked) {
+         await session.execute(`UPDATE trd_sources SET notifications=1 WHERE id=${sourceId}`);
+       } else {
+         await session.execute(`UPDATE trd_sources SET notifications=0 WHERE id=${sourceId}`);
+       }
+       this.inDb = await session.query('SELECT * FROM trd_sources');
+    },
     async removeSource(sourceId: number) {
       await session.execute(`DELETE FROM trd_sources WHERE id=${sourceId}`);
       this.inDb = await session.query('SELECT * FROM trd_sources')
