@@ -1,26 +1,50 @@
 <template>
-  <ion-page style='padding-right:5%; padding-top: 3%'>
+  <ion-page style='padding-right:5%; padding-top: 14%'>
+    <h1 style="margin: 0; margin-left: 8%">Sources</h1>
     <ion-item>
       <ion-grid>
         <ion-row>
           <ion-col size="10">
             <ion-input type="email" v-model='sourceUrl' placeholder='Correct source'></ion-input>
           </ion-col>
-          <ion-col size="2">
-            <ion-button @click="addSource">
-              <!-- <ion-icon name="arrow-down-circle-outline"></ion-icon> -->
-            </ion-button>
+          <ion-col size="2" class="add-source-icon">
+            <ion-icon @click="addSource"
+                      size="large"
+                      src="assets/icons/arrow-down-circle-outline.svg">
+            </ion-icon>
           </ion-col>
         </ion-row>
       </ion-grid>
     </ion-item>
-    <ion-content :fullscreen="false">
-      <p :key="source.index" v-for="source in inDb">
-        {{ source.name }}
-        <ion-toggle :checked="source.notifications"></ion-toggle>
-      </p>
+    <ion-content :fullscreen="false" class='content'>
+      <ion-grid>
+        <ion-row class='content'  :key="source.index" v-for="source in inDb">
+
+          <ion-col size="7" class="source-name-container">
+            <div class="">
+              <p class="source-name">{{ source.name }}</p>
+            </div>
+          </ion-col>
+
+          <ion-col size="3" class="source-name-container">
+            <div class="">
+              <ion-toggle @ionChange="changeNotifications($event, source.id)" :checked="source.notifications"></ion-toggle>
+            </div>
+          </ion-col>
+
+          <ion-col size="2" class="source-name-container">
+            <div class="">
+              <ion-icon size="large"
+                        src="assets/icons/close-outline.svg"
+                        @click="removeSource(source.id)">
+            </ion-icon>
+            </div>
+          </ion-col>
+
+        </ion-row>
+      </ion-grid>
     </ion-content>
-    <h1>Please turn on notifications  in settings</h1>
+    <p style="margin-left: 8%; margin-top: 15%; margin-bottom: 15%">Please turn on notifications  in settings</p>
   </ion-page>
 </template>
 
@@ -31,28 +55,27 @@ import { IonContent,
          IonInput,
          IonCol,
          IonGrid,
+         IonIcon,
          IonRow,
          IonItem,
-         IonToggle,
-         IonButton} from '@ionic/vue';
+         IonToggle} from '@ionic/vue';
 import { defineComponent } from 'vue';
-import { isRSS } from '@/services/helpers';
-import { rocket } from 'ionicons/icons';
-import { HTMLParser, sources, Options } from '@11me/xparse';
+  import { isRSS } from '@/services/helpers';
+  import { HTMLParser, sources, Options } from '@11me/xparse';
 
-import session from '@/main';
+  import session from '@/main';
 
-export default defineComponent({
-  components: {
-    IonContent,
-    IonPage,
-    IonCol,
-    IonGrid,
-    IonRow,
-    IonToggle,
-    IonItem,
-    IonInput,
-    IonButton
+  export default defineComponent({
+    components: {
+      IonContent,
+      IonPage,
+      IonCol,
+      IonIcon,
+      IonGrid,
+      IonRow,
+      IonToggle,
+      IonItem,
+      IonInput,
   },
   data() {
     return {
@@ -64,13 +87,24 @@ export default defineComponent({
     this.inDb = await session.query('SELECT * FROM trd_sources')
   },
   methods: {
-
+    async changeNotifications(change: any, sourceId: number) {
+       if (change.detail.checked) {
+         await session.execute(`UPDATE trd_sources SET notifications=1 WHERE id=${sourceId}`);
+       } else {
+         await session.execute(`UPDATE trd_sources SET notifications=0 WHERE id=${sourceId}`);
+       }
+       this.inDb = await session.query('SELECT * FROM trd_sources');
+    },
+    async removeSource(sourceId: number) {
+      await session.execute(`DELETE FROM trd_sources WHERE id=${sourceId}`);
+      this.inDb = await session.query('SELECT * FROM trd_sources')
+    },
     async addSource() {
       let options = {
-        name: 'vcru',
+        name: 'Bloomberg',
         url: 'vc.ru',
         state: 1,
-        notifications: 0,
+        notifications: 1,
         last_update: 100000
       }
       if (isRSS(this.sourceUrl)) {
@@ -92,4 +126,18 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.add-source-icon {
+  text-align: end !important
+}
+.content {
+  padding-left: 6.5% !important
+}
+
+.source-name {
+  margin: 0
+}
+
+.source-name-container {
+  align-self: center;
+}
 </style>
