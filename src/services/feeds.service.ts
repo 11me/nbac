@@ -18,7 +18,7 @@ async function getFeeds(options: Options) {
   feeds.value = await htmlParser.parse(options);
 }
 
-getFeeds(sources.thehackernews);
+//getFeeds(sources.thehackernews);
 
 export function useFeeds() {
   return {
