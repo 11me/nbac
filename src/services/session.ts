@@ -120,7 +120,6 @@ export default class SQLiteSession {
         ${source.notify},
         ${source.last_update}
       )`
-    console.log(query)
     await db.execute(query);
     await db.close()
   }
