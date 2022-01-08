@@ -18,7 +18,7 @@
     </ion-item>
     <ion-content :fullscreen='false' class='content'>
       <ion-grid>
-        <ion-row class='content'  :key='source.index' v-for='source in inDb'>
+        <ion-row class='content'  :key='source.index' v-for='source in initialDbSources'>
 
           <ion-col size='7' class='source-name-container'>
             <div>
@@ -28,7 +28,7 @@
 
           <ion-col size='3' class='source-name-container'>
             <div>
-              <ion-toggle @ionChange='changeNotifications($event, source.id)' :checked='source.notifications'></ion-toggle>
+              <ion-toggle @ionChange='changeNotifications($event, source)' :checked='source.notify'></ion-toggle>
             </div>
           </ion-col>
 
@@ -64,6 +64,7 @@ import { Http } from '@capacitor-community/http';
 import { isRSS } from '@/services/helpers';
 import session from '@/main';
 import { useFeeds } from '../services/feeds.service';
+import { Source } from '../models'
 
 export default defineComponent({
   components: {
@@ -72,7 +73,7 @@ export default defineComponent({
   },
   data() {
     return {
-      inDb: [] as never[],
+      initialDbSources: [] as never[],
       sourceUrl: ''
     }
   },
@@ -83,25 +84,26 @@ export default defineComponent({
     }
   },
   async created() {
-    this.inDb = await session.query('SELECT * FROM trd_sources')
+    this.initialDbSources = await session.selectSource()
   },
   methods: {
-    async changeNotifications(change: any, sourceId: number): Promise<void> {
+    async changeNotifications(change: any, source: Source): Promise<void> {
        if (change.detail.checked) {
-         await session.execute(`UPDATE trd_sources SET notifications=1 WHERE id=${sourceId}`);
+         source.notify = 1
+         await session.updateSource(source);
        } else {
-         await session.execute(`UPDATE trd_sources SET notifications=0 WHERE id=${sourceId}`);
+         source.notify = 0
+         await session.updateSource(source);
        }
-       this.inDb = await session.query('SELECT * FROM trd_sources');
+       this.initialDbSources = await session.selectSource();
     },
 
     async removeSource(sourceId: number) {
-      await session.execute(`DELETE FROM trd_sources WHERE id=${sourceId}`);
-      this.inDb = await session.query('SELECT * FROM trd_sources')
+      await session.deleteSource(sourceId);
+      this.initialDbSources = await session.selectSource();
     },
 
     async addSource(): Promise<void> {
-      console.log(this.feeds)
       async function fetchProvider(url: string) {
         const resource = await Http.get({url})
         return resource.data
@@ -125,29 +127,25 @@ export default defineComponent({
           }
         }
       });
-      let options = {
-        name: rss[0].title[0],
-        url: this.sourceUrl,
-        state: 1,
-        notifications: 1,
-        last_update: 10000
-      }
+
       if (isRSS(this.sourceUrl)) {
-        let query = `
-          INSERT INTO
-            trd_sources (name, url, state, notifications, last_update)
-          VALUES (
-            '${options.name}', '${options.url}', ${options.state},
-            ${options.notifications}, ${options.last_update}
-          )`
-        await session.execute(query);
-        this.inDb = await session.query('SELECT * FROM trd_sources');
+        let source = {
+          id: 1,
+          name: rss[0].title[0],
+          url: this.sourceUrl,
+          last_update: 100000,
+          notify: 1,
+          state: 1
+        }
+        await session.insertSource(source);
+        this.initialDbSources = await session.selectSource();
       } else {
         console.log('not')
       }
     }
   }
 });
+
 </script>
 
 <style scoped>
