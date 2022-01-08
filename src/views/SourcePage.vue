@@ -130,7 +130,7 @@ export default defineComponent({
         url: this.sourceUrl,
         state: 1,
         notifications: 1,
-        last_update: 100000
+        last_update: 10000
       }
       if (isRSS(this.sourceUrl)) {
         let query = `
