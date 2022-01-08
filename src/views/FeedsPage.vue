@@ -1,11 +1,9 @@
 <template>
   <ion-page>
-
-    <ion-content :fullscreen="true">
-      <h1>nbac</h1>
+    <status-bar />
+    <ion-content>
       <ul>
         <li v-for="feed in feeds" :key="feed.title">{{ feed.title }}</li>
-        <p>custom text</p>
         <ion-button @click="() => getFeeds(thehackernews)">Get</ion-button>
       </ul>
     </ion-content>
@@ -14,16 +12,22 @@
 </template>
 
 <script lang="ts">
-import { IonContent, IonPage, IonButton } from '@ionic/vue';
 import { defineComponent, onMounted } from 'vue';
 import { useFeeds } from '../services/feeds.service';
 import { sources } from '@11me/xparse';
+import StatusBar from '../components/StatusBar.vue'
+import {
+  IonContent,
+  IonPage,
+  IonButton,
+} from '@ionic/vue';
 
 export default defineComponent({
   components: {
     IonContent,
     IonPage,
-    IonButton
+    IonButton,
+    StatusBar
   },
 
   setup() {
