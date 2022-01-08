@@ -73,7 +73,7 @@ export default defineComponent({
   },
   data() {
     return {
-      initialDbSources: [] as never[],
+      initialDbSources: [],
       sourceUrl: ''
     }
   },
