@@ -110,23 +110,7 @@ export default defineComponent({
       }
       const rssParser = new RSSParser(fetchProvider);
 
-      let rss = await rssParser.parse({
-        description: { 'url': this.sourceUrl, 'page_selector': '' },
-        options: {
-          title: {
-            selectors: ''
-          },
-          author: {
-            selectors: ''
-          },
-          pubDate: {
-            selectors: ''
-          },
-          content: {
-            selectors: ''
-          }
-        }
-      });
+      let rss = await rssParser.parse(this.sourceUrl);
 
       if (isRSS(this.sourceUrl)) {
         let source = {
