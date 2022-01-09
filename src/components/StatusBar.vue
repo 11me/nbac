@@ -3,10 +3,7 @@
     <!--<img class="nbac_statusbar-logo" src="@/assets/nbac_cat.svg" alt="logo">-->
     <ion-icon size="large" src="assets/nbac_cat.svg"></ion-icon>
     <div @click="hadleClick" class="nbac_statusbar-hamburger-menu-container">
-      <div ref="hamburgerMenu" class="nbac_statusbar-hamburger-menu-line-container">
-        <span class="nbac_statusbar-hamburger-menu-line"></span>
-        <span class="nbac_statusbar-hamburger-menu-line"></span>
-      </div>
+      <div ref="menu" class="nbac_statusbar-hamburger-menu-line-box"></div>
     </div>
   </div>
 </template>
@@ -25,7 +22,7 @@ export default defineComponent({
   methods: {
     hadleClick: function(e: any) {
       e.stopPropagation();
-      (this.$refs.hamburgerMenu as any).classList.toggle('nbac_statusbar-hamburger-menu-active');
+      (this.$refs.menu as any).classList.toggle('nbac_statusbar-menu-rotate');
     }
   }
 });
@@ -34,40 +31,37 @@ export default defineComponent({
 
 <style>
 .nbac_statusbar-container {
-  margin: 35px 25px 0 25px;
+  margin: 26px 26px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 .nbac_statusbar-logo {
-  width: 65px;
-  height: 50px;
+  width: 50rem;
+  height: 45rem;
   display: block;
 }
 .nbac_statusbar-hamburger-menu-container {
-  border: 0.5px solid var(--nbac-color-grey);
+  border: thin solid var(--nbac-color-grey);
   border-radius: 13px;
   width: 45px;
   height: 45px;
   cursor: pointer;
 }
-.nbac_statusbar-hamburger-menu-line-container {
-  box-sizing: border-box;
-  margin: 35% auto;
+.nbac_statusbar-hamburger-menu-line-box {
+  border-top: thin solid var(--nbac-color-grey);
+  border-bottom: thin solid var(--nbac-color-grey);
+  width: 24px;
+  height: 16px;
+  margin: 12px auto;
+  transform: rotate(90deg);
   transition: all 0.2s ease-in-out;
 }
-.nbac_statusbar-hamburger-menu-line {
-  width: 20px;
-  height: 2px;
-  display: block;
-  background-color: var(--nbac-color-grey);
-  margin: 8px auto;
-}
-.nbac_statusbar-hamburger-menu-active {
-  transform: rotate(-90deg);
+.nbac_statusbar-menu-rotate {
+  transform: rotate(180deg);
 }
 ion-icon {
-  width: 65px;
-  height: 50px;
+  width: 4rem;
+  height: 3rem;
 }
 </style>

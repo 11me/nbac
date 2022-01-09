@@ -13,7 +13,7 @@
     "@11me/xparse": "^0.1.5",
     "@capacitor-community/http": "^1.4.1",
     "@capacitor-community/sqlite": "^3.3.3-4",
-    "@capacitor/android": "3.3.3",
+    "@capacitor/android": "3.3.4",
     "@capacitor/app": "1.0.7",
     "@capacitor/core": "3.3.3",
     "@capacitor/haptics": "1.1.3",
