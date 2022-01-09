@@ -15,15 +15,17 @@
         Subscribe to web-sites rss feed you want to read
       </p>
     </div>
-    <button class="nbac-button">Add links</button>
+    <nbac-button linkTo="/source">Add links</nbac-button>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import NbacButton from '../components/NbacButton.vue';
 
 export default defineComponent({
   components: {
+    NbacButton
   }
 });
 </script>
@@ -46,15 +48,5 @@ export default defineComponent({
   margin-top: 30px;
   font-size: 17px;
   font-weight: 500;
-}
-.nbac-button {
-  display: block;
-  font-size: 16px;
-  margin: 50px auto;
-  background-color: #fff;
-  width: 185px;
-  height: 48px;
-  border: thin solid #000;
-  border-radius: 30px;
 }
 </style>
