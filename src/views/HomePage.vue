@@ -1,67 +1,60 @@
 <template>
-  <ion-page>
-    <ion-header :translucent="true">
-      <ion-toolbar>
-        <ion-title>Blank</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Blank</ion-title>
-        </ion-toolbar>
-      </ion-header>
-    
-      <div id="container">
-        <strong>Ready to create an app?</strong>
-        <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-      </div>
-    </ion-content>
-  </ion-page>
+  <div class="nbac_home-container">
+    <div class="nbac_home-title">
+      <h1>nbac</h1>
+      <h2>all in one news feed</h2>
+    </div>
+    <div class="nbac_home-content">
+      <p>
+        You have found a news feed without advertisement
+        and personal data usage
+      </p>
+    </div>
+    <div class="nbac_home-content">
+      <p>
+        Subscribe to web-sites rss feed you want to read
+      </p>
+    </div>
+    <button class="nbac-button">Add links</button>
+  </div>
 </template>
 
 <script lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
   components: {
-    IonContent,
-    IonHeader,
-    IonPage,
-    IonTitle,
-    IonToolbar
   }
 });
 </script>
 
-<style scoped>
-#container {
-  text-align: center;
-  
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+<style>
+.nbac_home-container {
+  margin: 150px 30px;
 }
-
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.nbac_home-title {
 }
-
-#container p {
+.nbac_home-title h1 {
+  font-size: 42px;
+  line-height: 0.6;
+}
+.nbac_home-title h2 {
+  font-size: 24px;
+  line-height: 0.6;
+}
+.nbac_home-content {
+  margin-top: 30px;
+  font-size: 17px;
+  font-weight: 500;
+}
+.nbac-button {
+  display: block;
   font-size: 16px;
-  line-height: 22px;
-  
-  color: #8c8c8c;
-  
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
+  margin: 50px auto;
+  background-color: #fff;
+  width: 185px;
+  height: 48px;
+  border: thin solid #000;
+  border-radius: 30px;
 }
 </style>
