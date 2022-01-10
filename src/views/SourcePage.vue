@@ -115,7 +115,7 @@ export default defineComponent({
       if (isRSS(this.sourceUrl)) {
         let source = {
           id: 1,
-          name: rss[0].title[0],
+          name: rss[0].creator,
           url: this.sourceUrl,
           last_update: 100000,
           notify: 1,
