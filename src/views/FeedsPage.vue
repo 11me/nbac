@@ -10,11 +10,11 @@
         <div v-for="feed in feeds" :key="feed.title" class="nbac_feed-one-feed">
           <h2 class="nbac_feed-title">{{ feed.title }}</h2>
           <p>
-            {{ feed.content }}
+            {{ truncate(feed.description, 300) }}
           </p>
           <div class="nbac_feed-one-feed-bar">
-            <div><span class="nbac_feed-date">{{ feed.pubDate }}</span><font-awesome-icon icon="paper-plane" /><span></span></div>
-            <div>source</div>
+            <div><span class="nbac_feed-date">{{ formatDate(feed.pubDate) }}</span><font-awesome-icon icon="paper-plane" /><span></span></div>
+            <div><a :href="feed.link">{{ feed.creator }}</a></div>
           </div>
         </div>
 
@@ -31,6 +31,7 @@ import { sources } from '@11me/xparse';
 import StatusBar from '../components/StatusBar.vue';
 import NbacButton from '../components/NbacButton.vue';
 import { IonContent } from '@ionic/vue';
+import moment from 'moment';
 
 export default defineComponent({
   components: {
@@ -43,10 +44,20 @@ export default defineComponent({
     const { feeds, getFeeds } = useFeeds();
     const thehackernews = sources.thehackernews;
     thehackernews.description.url = 'http://70.34.217.128:8888/thehackernews.com';
+
+    function truncate(content: string, len: number): string {
+      return `${content.substring(0, len)} ...`;
+    }
+    function formatDate(d: string): string {
+      const m = moment(d).format('D.MM.YY');
+      return m
+    }
     return {
       feeds,
       getFeeds,
-      thehackernews
+      thehackernews,
+      truncate,
+      formatDate
     }
   }
 });
@@ -66,12 +77,13 @@ export default defineComponent({
 .nbac_feed-one-feed p {
   font-size: 17px;
   font-style: normal;
+  margin-bottom: 25px;
 }
 .nbac_feed-one-feed-bar {
   display: flex;
   justify-content: space-between;
 }
 .nbac_feed-date {
-  margin-right: 5px;
+  margin-right: 15px;
 }
 </style>

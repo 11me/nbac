@@ -13,3 +13,8 @@ h2 {
   font-weight: medium;
   font-size: 1rem;
 }
+
+a, a:hover, a:visited, a:active {
+  text-decoration: none;
+  color: #000;
+}
