@@ -1,33 +1,42 @@
 <template>
-  <ion-page>
+  <ion-content>
     <status-bar />
-    <ion-content>
-      <ul>
-        <li v-for="feed in feeds" :key="feed.title">{{ feed.title }}</li>
-        <ion-button @click="() => getFeeds(thehackernews)">Get</ion-button>
-      </ul>
-    </ion-content>
+    <div class="nbac_feed-container">
 
-  </ion-page>
+      <div class="nbac_feed-short-feeds"></div>
+
+      <div class="nbac_feed-long-feeds">
+
+        <div v-for="feed in feeds" :key="feed.title" class="nbac_feed-one-feed">
+          <h2 class="nbac_feed-title">{{ feed.title }}</h2>
+          <p>
+            {{ feed.content }}
+          </p>
+          <div class="nbac_feed-one-feed-bar">
+            <div><span class="nbac_feed-date">{{ feed.pubDate }}</span><font-awesome-icon icon="paper-plane" /><span></span></div>
+            <div>source</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+      <nbac-button @click="() => getFeeds(thehackernews)">Get</nbac-button>
+  </ion-content>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';
 import { useFeeds } from '../services/feeds.service';
 import { sources } from '@11me/xparse';
-import StatusBar from '../components/StatusBar.vue'
-import {
-  IonContent,
-  IonPage,
-  IonButton,
-} from '@ionic/vue';
+import StatusBar from '../components/StatusBar.vue';
+import NbacButton from '../components/NbacButton.vue';
+import { IonContent } from '@ionic/vue';
 
 export default defineComponent({
   components: {
     IonContent,
-    IonPage,
-    IonButton,
-    StatusBar
+    StatusBar,
+    NbacButton,
   },
 
   setup() {
@@ -44,4 +53,25 @@ export default defineComponent({
 </script>
 
 <style>
+.nbac_feed-container {
+  margin: 35px 25px;
+}
+.nbac_feed-one-feed {
+
+}
+.nbac_feed-one-feed h2 {
+  font-size: 24px;
+  font-weight: bold;
+}
+.nbac_feed-one-feed p {
+  font-size: 17px;
+  font-style: normal;
+}
+.nbac_feed-one-feed-bar {
+  display: flex;
+  justify-content: space-between;
+}
+.nbac_feed-date {
+  margin-right: 5px;
+}
 </style>
