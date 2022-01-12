@@ -91,6 +91,7 @@ export default class SQLiteSession {
     return [];
   }
 
+  // TODO: add offset as parameter for pagination
   public async getAllSources(): Promise<any[]> {
     const db = await this.conn;
     await db.open();

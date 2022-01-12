@@ -5,10 +5,10 @@
       <ion-grid>
         <ion-row>
           <ion-col size='10'>
-            <ion-input type='email' v-model='sourceUrl' placeholder='Source URL'></ion-input>
+            <ion-input type='url' v-model='sourceUrl' placeholder='Source URL'></ion-input>
           </ion-col>
           <ion-col size='2' class='add-source-icon'>
-            <ion-icon @click='addSource'
+            <ion-icon @click='() => addSource(sourceUrl)'
                       size='large'
                       src='assets/icons/arrow-down-circle-outline.svg'>
             </ion-icon>
@@ -18,7 +18,7 @@
     </ion-item>
     <ion-content :fullscreen='false' class='content'>
       <ion-grid>
-        <ion-row class='content'  :key='source.index' v-for='source in initialDbSources'>
+        <ion-row class='content'  :key='source.index' v-for='source in sources'>
 
           <ion-col size='7' class='source-name-container'>
             <div>
@@ -36,7 +36,7 @@
             <div class=''>
               <ion-icon size='large'
                         src='assets/icons/close-outline.svg'
-                        @click='removeSource(source.id)'>
+                        @click='removeSourceByID(source.id)'>
             </ion-icon>
             </div>
           </ion-col>
@@ -49,85 +49,57 @@
 </template>
 
 <script lang="ts">
-// Vue/Ionic
+import { defineComponent, ref } from 'vue';
 import {
-  IonContent, IonPage, IonLabel, IonInput, IonCol,
-  IonGrid, IonIcon, IonRow, IonItem, IonToggle
+  IonContent,
+  IonPage,
+  IonLabel,
+  IonInput,
+  IonCol,
+  IonGrid,
+  IonIcon,
+  IonRow,
+  IonItem,
+  IonToggle
 } from '@ionic/vue';
-import { defineComponent, PropType } from 'vue';
 
-// NPM
-import { RSSParser, sources, Options } from '@11me/xparse';
-import { Http } from '@capacitor-community/http';
-
-// inner
-import { isRSS } from '@/services/helpers';
-import session from '@/main';
-import { useFeeds } from '../services/feeds.service';
-import { Source } from '../models'
+import { useSources } from '@/services/rss.service';
 
 export default defineComponent({
   components: {
-    IonContent, IonPage, IonCol, IonIcon,
-    IonGrid, IonRow, IonToggle, IonItem, IonInput,
+    IonContent,
+    IonPage,
+    IonCol,
+    IonIcon,
+    IonGrid,
+    IonRow,
+    IonToggle,
+    IonItem,
+    IonInput,
   },
-  data() {
-    return {
-      initialDbSources: [] as PropType<any[]>,
-      sourceUrl: ''
-    }
-  },
+
   setup() {
-    const { feeds, getFeeds } = useFeeds();
+
+    const {
+      sources,
+      sourceUrl,
+      addSource,
+      setSources,
+      removeSourceByID,
+      toggleNotificationState
+    } = useSources();
+
+    // call set sources to update them when created
+    setSources();
+
     return {
-      feeds
+      sourceUrl,
+      sources,
+      addSource,
+      removeSourceByID,
+      toggleNotificationState
     }
   },
-  async created() {
-    this.initialDbSources = await session.getAllSources();
-  },
-  methods: {
-    async toggleNotificationState(e: any, source: Source): Promise<void> {
-       if (e.detail.checked) {
-         source.notify = 1
-         await session.updateSource(source);
-       } else {
-         source.notify = 0
-         await session.updateSource(source);
-       }
-       this.initialDbSources = await session.getAllSources();
-    },
-
-    async removeSource(sourceId: number) {
-      await session.deleteSourceByID(sourceId);
-      this.initialDbSources = await session.getAllSources();
-    },
-
-    async addSource(): Promise<void> {
-      async function fetchProvider(url: string) {
-        const resource = await Http.get({url})
-        return resource.data
-      }
-      const rssParser = new RSSParser(fetchProvider);
-
-      let rss = await rssParser.parse(this.sourceUrl);
-
-      if (isRSS(this.sourceUrl)) {
-        let source = {
-          id: 1,
-          name: rss[0].creator,
-          url: this.sourceUrl,
-          last_update: 100000,
-          notify: 1,
-          state: 1
-        }
-        await session.insertSource(source);
-        this.initialDbSources = await session.getAllSources();
-      } else {
-        console.log('not')
-      }
-    }
-  }
 });
 
 </script>
