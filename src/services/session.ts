@@ -6,38 +6,40 @@ import
   CapacitorSQLite,
   SQLiteConnection,
   SQLiteDBConnection,
-  capSQLiteChanges
 } from '@capacitor-community/sqlite';
 
 
 export default class SQLiteSession {
   dbName: string;
+  tableName: string;
   platform: string;
   sqliteConn: SQLiteConnection;
   conn: Promise<SQLiteDBConnection>;
 
-  constructor(dbName: string) {
+  constructor(dbName: string, tableName: string) {
     this.sqliteConn = new SQLiteConnection(CapacitorSQLite);
     this.dbName = dbName;
+    this.tableName = tableName;
     this.platform = Capacitor.getPlatform();
     //TODO: get rid of async call in constructor
     this.conn = (async () => { return await this.getCoonection()})();
   }
 
   private async initWeb() {
-
-    if (this.platform === "web") {
-      const jeepSqlite = document.createElement('jeep-sqlite');
-      document.body.appendChild(jeepSqlite);
-      await customElements.whenDefined('jeep-sqlite');
-      await this.sqliteConn.initWebStore();
-    }
+    const jeepSqlite = document.createElement('jeep-sqlite');
+    document.body.appendChild(jeepSqlite);
+    await customElements.whenDefined('jeep-sqlite');
+    await this.sqliteConn.initWebStore();
   }
 
   private async getCoonection(): Promise<SQLiteDBConnection> {
-    await this.initWeb();
-    // check connection consistency between js and native conn
+
+    if (this.platform === 'web') {
+      await this.initWeb();
+    }
+    // check connection consistency between js and native connection
     const connConsistent = (await this.sqliteConn.checkConnectionsConsistency()).result;
+
     // check if connection exists
     const connExists = (await this.sqliteConn.isConnection(this.dbName)).result;
 
@@ -48,40 +50,52 @@ export default class SQLiteSession {
     return await this.sqliteConn.createConnection(this.dbName, false, "no-encryption", 1);
   }
 
-  public async createTables(): Promise<capSQLiteChanges> {
+  // createTables returns the number of changes were made
+  // or -1 if nothing happened
+  public async createTables(): Promise<number> {
     const db = await this.conn;
     await db.open();
-    const changes = await db.execute(`
-      CREATE TABLE IF NOT EXISTS trd_sources (
+
+    const changes = (await db.execute(`
+      CREATE TABLE IF NOT EXISTS ${this.tableName} (
         id INTEGER PRIMARY KEY NOT NULL,
         name TEXT NOT NULL,
         url TEXT NOT NULL,
         state INTEGER NOT NULL,
         notify INTEGER NOT NULL,
         last_update INTEGER NOT NULL
-    );`);
+    );`)).changes;
+
+    //TODO: get rid of console.log
     console.log('createTables');
     await db.close();
-    return changes;
+
+    if (typeof(changes) === 'number' ) {
+      return changes;
+    }
+    return -1;
   }
 
-  public async getSourceByID(sourceId: number): Promise<any[] | undefined> {
+  public async getSourceByID(sourceId: number): Promise<any[]> {
     const db = await this.conn;
     await db.open();
 
-    const query = `SELECT * FROM trd_sources WHERE id=${sourceId}`;
-    const data = await db.query(query);
+    const query = `SELECT * FROM ${this.tableName} WHERE id=${sourceId}`;
+    const data = (await db.query(query)).values;
 
     await db.close();
 
-    return data.values;
+    if (data) {
+      return data;
+    }
+    return [];
   }
 
   public async getAllSources(): Promise<any[]> {
     const db = await this.conn;
     await db.open();
 
-    const query = `SELECT * FROM trd_sources`;
+    const query = `SELECT * FROM ${this.tableName}`;
     const data = (await db.query(query)).values;
 
     await db.close();
@@ -92,12 +106,12 @@ export default class SQLiteSession {
   }
 
   // TODO: make it UPSERT
-  public async updateSource(source: Source): Promise<void> {
+  public async updateSource(source: Source): Promise<number> {
     const db = await this.conn;
     await db.open();
-    await db.execute(`
+    const updated = (await db.execute(`
       UPDATE
-        trd_sources
+        ${this.tableName}
       SET
         name='${source.name}',
         url='${source.url}',
@@ -105,25 +119,39 @@ export default class SQLiteSession {
         notify=${source.notify},
         state=${source.state}
       WHERE
-        id=${source.id}`);
+        id=${source.id}`)).changes;
+
     await db.close();
+
+      if (typeof(updated) === 'number') {
+        return updated;
+      }
+      return -1;
   }
 
-  public async deleteSourceByID(sourceId: number): Promise<void> {
+  public async deleteSourceByID(sourceId: number): Promise<number> {
     const db = await this.conn;
     await db.open();
 
-    await db.execute(`DELETE FROM trd_sources WHERE id=${sourceId}`);
+    const deleted = (
+      await db.execute(`DELETE FROM ${this.tableName} WHERE id=${sourceId}`)
+    ).changes;
+
     await db.close();
+
+    if (typeof(deleted) === 'number') {
+      return deleted;
+    }
+    return -1;
   }
 
-  public async insertSource(source: Source): Promise<void> {
+  public async insertSource(source: Source): Promise<number> {
     //console.log(source)
     const db = await this.conn;
     await db.open();
     const query = `
       INSERT INTO
-        trd_sources (name, url, state, notify, last_update)
+        ${this.tableName} (name, url, state, notify, last_update)
       VALUES (
         '${source.name}',
         '${source.url}',
@@ -131,7 +159,12 @@ export default class SQLiteSession {
         ${source.notify},
         ${source.last_update}
       )`;
-    await db.execute(query);
+    const inserted = (await db.execute(query)).changes;
     await db.close()
+
+    if (typeof(inserted) === 'number') {
+      return inserted;
+    }
+    return -1;
   }
 }

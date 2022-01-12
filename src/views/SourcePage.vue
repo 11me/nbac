@@ -28,7 +28,7 @@
 
           <ion-col size='3' class='source-name-container'>
             <div>
-              <ion-toggle @ionChange='changeNotifications($event, source)' :checked='source.notify'></ion-toggle>
+              <ion-toggle @ionChange='toggleNotificationState($event, source)' :checked='source.notify'></ion-toggle>
             </div>
           </ion-col>
 
@@ -87,8 +87,8 @@ export default defineComponent({
     this.initialDbSources = await session.getAllSources();
   },
   methods: {
-    async changeNotifications(change: any, source: Source): Promise<void> {
-       if (change.detail.checked) {
+    async toggleNotificationState(e: any, source: Source): Promise<void> {
+       if (e.detail.checked) {
          source.notify = 1
          await session.updateSource(source);
        } else {

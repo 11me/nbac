@@ -36,7 +36,7 @@ applyPolyfills().then(() => {
     jeepSqlite(window);
 });
 
-const session = new SQLiteSession('db_tab3SQLite');
+const session = new SQLiteSession('db_tab3SQLite', 'trd_sources');
 
 session.createTables()
 
