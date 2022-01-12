@@ -73,7 +73,7 @@ export default defineComponent({
   },
   data() {
     return {
-      initialDbSources: Object as PropType<any[]>,
+      initialDbSources: [] as PropType<any[]>,
       sourceUrl: ''
     }
   },
@@ -122,7 +122,7 @@ export default defineComponent({
           state: 1
         }
         await session.insertSource(source);
-        this.initialDbSources = await session.selectSource();
+        this.initialDbSources = await session.getAllSources();
       } else {
         console.log('not')
       }

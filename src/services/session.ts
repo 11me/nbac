@@ -77,16 +77,18 @@ export default class SQLiteSession {
     return data.values;
   }
 
-  public async getAllSources(): Promise<any[] | undefined> {
+  public async getAllSources(): Promise<any[]> {
     const db = await this.conn;
     await db.open();
 
     const query = `SELECT * FROM trd_sources`;
-    const data = await db.query(query);
+    const data = (await db.query(query)).values;
 
     await db.close();
-
-    return data.values;
+    if (data) {
+      return data
+    }
+    return []
   }
 
   // TODO: make it UPSERT
