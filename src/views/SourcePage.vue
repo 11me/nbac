@@ -54,7 +54,7 @@ import {
   IonContent, IonPage, IonLabel, IonInput, IonCol,
   IonGrid, IonIcon, IonRow, IonItem, IonToggle
 } from '@ionic/vue';
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
 // NPM
 import { RSSParser, sources, Options } from '@11me/xparse';
@@ -73,7 +73,7 @@ export default defineComponent({
   },
   data() {
     return {
-      initialDbSources: [],
+      initialDbSources: Object as PropType<any[]>,
       sourceUrl: ''
     }
   },
@@ -84,7 +84,7 @@ export default defineComponent({
     }
   },
   async created() {
-    this.initialDbSources = await session.selectSource()
+    this.initialDbSources = await session.getAllSources();
   },
   methods: {
     async changeNotifications(change: any, source: Source): Promise<void> {
@@ -95,12 +95,12 @@ export default defineComponent({
          source.notify = 0
          await session.updateSource(source);
        }
-       this.initialDbSources = await session.selectSource();
+       this.initialDbSources = await session.getAllSources();
     },
 
     async removeSource(sourceId: number) {
-      await session.deleteSource(sourceId);
-      this.initialDbSources = await session.selectSource();
+      await session.deleteSourceByID(sourceId);
+      this.initialDbSources = await session.getAllSources();
     },
 
     async addSource(): Promise<void> {
