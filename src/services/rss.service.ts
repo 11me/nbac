@@ -30,7 +30,8 @@ async function addSource(url: string) {
     url: url,
     last_update: Date.now(),
     notify: 1,
-    state: 1
+    state: 1,
+    source_type: 'rss'
   }
   await session.insertSource(source);
   await setSources();

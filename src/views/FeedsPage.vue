@@ -22,17 +22,17 @@
         <div v-for="feed in feeds" :key="feed.title" class="nbac_feed-one-feed">
           <h2 class="nbac_feed-title">{{ feed.title }}</h2>
           <p>
-            {{ truncate(feed.description, 300) }}
+            {{ truncate(feed.content, 300) }}
           </p>
           <div class="nbac_feed-one-feed-bar">
-            <div><span class="nbac_feed-date">{{ formatDate(feed.pubDate) }}</span><font-awesome-icon icon="paper-plane" /><span></span></div>
+            <div><span class="nbac_feed-date">{{ formatDate(feed.pub_date) }}</span><font-awesome-icon icon="paper-plane" /><span></span></div>
             <div><a :href="feed.link">{{ feed.creator }}</a></div>
           </div>
         </div>
 
       </div>
     </div>
-      <nbac-button @click="() => getFeeds(thehackernews)">Get</nbac-button>
+      <nbac-button @click="getFeeds()">Get</nbac-button>
   </ion-content>
 </template>
 
@@ -53,10 +53,6 @@ export default defineComponent({
   },
   setup(props, context) {
     const { feeds, getFeeds } = useFeeds();
-    const thehackernews = sources.thehackernews;
-
-    thehackernews.description.url = 'http://70.34.217.128:8888/thehackernews.com';
-    getFeeds(thehackernews);
 
     function truncate(content: string, len: number): string {
       return `${content.substring(0, len)} ...`;
@@ -69,7 +65,6 @@ export default defineComponent({
     return {
       feeds,
       getFeeds,
-      thehackernews,
       truncate,
       formatDate,
     }

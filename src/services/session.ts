@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { Source } from '../models'
+import { Source, Feed } from '../models'
 
 import
 {
@@ -11,15 +11,17 @@ import
 
 export default class SQLiteSession {
   dbName: string;
-  tableName: string;
+  sourcesTable: string;
+  feedsTable: string;
   platform: string;
   sqliteConn: SQLiteConnection;
   conn: Promise<SQLiteDBConnection>;
 
-  constructor(dbName: string, tableName: string) {
+  constructor(dbName: string) {
     this.sqliteConn = new SQLiteConnection(CapacitorSQLite);
     this.dbName = dbName;
-    this.tableName = tableName;
+    this.sourcesTable = 'trd_sources';
+    this.feedsTable = 'feeds';
     this.platform = Capacitor.getPlatform();
     //TODO: get rid of async call in constructor
     this.conn = (async () => { return await this.getCoonection()})();
@@ -57,13 +59,25 @@ export default class SQLiteSession {
     await db.open();
 
     const changes = (await db.execute(`
-      CREATE TABLE IF NOT EXISTS ${this.tableName} (
+      CREATE TABLE IF NOT EXISTS ${this.sourcesTable} (
         id INTEGER PRIMARY KEY NOT NULL,
-        name TEXT NOT NULL,
-        url TEXT NOT NULL,
+        name VARCHAR(100) NOT NULL,
+        url VARCHAR(255) NOT NULL,
         state INTEGER NOT NULL,
         notify INTEGER NOT NULL,
-        last_update INTEGER NOT NULL
+        last_update INTEGER NOT NULL,
+        source_type VARCHAR(10) NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS ${this.feedsTable} (
+        id INTEGER PRIMARY KEY NOT NULL,
+        guid VARCHAR(100) NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        author VARCHAR(50),
+        pub_date VARCHAR(20),
+        content TEXT NOT NULL,
+        source_id INTEGER NOT NULL,
+        seen INTEGER DEFAULT 0,
+        FOREIGN KEY(source_id) REFERENCES ${this.sourcesTable}(id)
     );`)).changes;
 
     //TODO: get rid of console.log
@@ -76,11 +90,13 @@ export default class SQLiteSession {
     return -1;
   }
 
-  public async getSourceByID(sourceId: number): Promise<any[]> {
+  public async getSourceByID(sourceId: number): Promise<any> {
     const db = await this.conn;
     await db.open();
 
-    const query = `SELECT * FROM ${this.tableName} WHERE id=${sourceId}`;
+    const query = `
+    SELECT * FROM ${this.sourcesTable}
+    WHERE id=${sourceId}`;
     const data = (await db.query(query)).values;
 
     await db.close();
@@ -88,15 +104,15 @@ export default class SQLiteSession {
     if (data) {
       return data;
     }
-    return [];
+    return null;
   }
 
   // TODO: add offset as parameter for pagination
-  public async getAllSources(): Promise<any[]> {
+  public async getAllSources(): Promise<Source[]> {
     const db = await this.conn;
     await db.open();
 
-    const query = `SELECT * FROM ${this.tableName}`;
+    const query = `SELECT * FROM ${this.sourcesTable}`;
     const data = (await db.query(query)).values;
 
     await db.close();
@@ -112,7 +128,7 @@ export default class SQLiteSession {
     await db.open();
     const updated = (await db.execute(`
       UPDATE
-        ${this.tableName}
+        ${this.sourcesTable}
       SET
         name='${source.name}',
         url='${source.url}',
@@ -135,7 +151,7 @@ export default class SQLiteSession {
     await db.open();
 
     const deleted = (
-      await db.execute(`DELETE FROM ${this.tableName} WHERE id=${sourceId}`)
+      await db.execute(`DELETE FROM ${this.sourcesTable} WHERE id=${sourceId}`)
     ).changes;
 
     await db.close();
@@ -152,20 +168,72 @@ export default class SQLiteSession {
     await db.open();
     const query = `
       INSERT INTO
-        ${this.tableName} (name, url, state, notify, last_update)
+        ${this.sourcesTable} (name, url, state, notify, last_update, source_type)
       VALUES (
         '${source.name}',
         '${source.url}',
         ${source.state},
         ${source.notify},
-        ${source.last_update}
-      )`;
-    const inserted = (await db.execute(query)).changes;
-    await db.close()
+        ${source.last_update},
+        '${source.source_type}'
+      )
+      RETURNING id`;
+    const lastId = (await db.run(query)).changes?.lastId;
 
-    if (typeof(inserted) === 'number') {
-      return inserted;
+    await db.close();
+
+    if (lastId) {
+      return  lastId;
     }
     return -1;
   }
+
+  public async insertFeed(feed: Feed, src_id: number): Promise<number> {
+    const db = await this.conn;
+    await db.open();
+
+    const query = `
+    INSERT INTO ${this.feedsTable}
+    (
+      guid,
+      title,
+      author,
+      pub_date,
+      content,
+      source_id
+    )
+    VALUES (
+      ${feed.guid},
+      ${feed.title},
+      ${feed.author},
+      ${feed.pub_date},
+      ${feed.content},
+      ${src_id}
+    );`;
+
+    const lastId = (await db.run(query)).changes?.lastId;
+
+    db.close();
+
+    if (lastId) {
+      return lastId;
+    }
+    return -1;
+  }
+
+  public async getAllFeeds(): Promise<Feed[]> {
+    const query = `SELECT * FROM ${this.feedsTable}`
+    const db = await this.conn;
+    await db.open();
+
+    const feeds = (await db.query(query)).values;
+
+
+    await db.close();
+    if (feeds) {
+      return feeds
+    }
+    return []
+  }
+
 }
