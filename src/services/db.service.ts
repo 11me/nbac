@@ -1,7 +1,7 @@
 // Dabatase service incapsultes methods
 // to communicate with SQLiteDBSession.
 
-import { Source, Err, DBResult } from '@/models';
+import { Source, Feed, Err, DBResult } from '@/models';
 
 const SOURCES_TABLE = 'sources';
 const FEEDS_TABLE   = 'feeds';
@@ -64,7 +64,7 @@ export async function insertSource(source: Source): Promise<DBResult> {
 }
 
 export async function getSources(): Promise<DBResult> {
-  const query = `SELECT * FROM ${SOURCES_TABLE}`;
+  const query = `SELECT * FROM ${SOURCES_TABLE};`;
 
   //TODO: implement a call
 
@@ -96,10 +96,64 @@ export async function updateSource(source: Source): Promise<DBResult> {
     Date.now(),
     source.state,
     source.id
-  ]
+  ];
 
   //TODO: implement
   return {
     changes: 1
+  }
+}
+
+//** logic related to feeds //
+
+export async function getFeeds(): Promise<DBResult> {
+  const query = `SELECT * FROM ${FEEDS_TABLE};`;
+
+  //TODO...
+  //
+  return {
+    data: [
+      {
+        id: 1,
+        guid: 'skxksi',
+        title: 'Feed title',
+        author: 'Aristotel',
+        pub_date: Date.now(),
+        content: 'Some long content',
+        source_id: 1,
+        seen: 1
+      }
+    ]
+  }
+}
+
+export async function insertFeed(feed: Feed, src_id: number): Promise<DBResult> {
+  const sqlcmd = `
+  INSERT INTO ${FEEDS_TABLE}
+  (
+    guid,
+    title,
+    author,
+    pub_date,
+    content,
+    source_id,
+    seen
+  )
+  VALUES
+  (
+    ?,?,?,?,?,?,?
+  );`;
+
+  const values = [
+    feed.guid,
+    feed.title,
+    feed.author,
+    feed.pub_date,
+    feed.content,
+    src_id
+  ];
+
+  return {
+    lastId: 1
   }
 }
