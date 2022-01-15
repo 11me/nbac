@@ -1,5 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { Source, Feed } from '../models'
+import { DBResult, Err } from '@/models'
+
 
 import
 {
@@ -52,188 +54,42 @@ export default class SQLiteSession {
     return await this.sqliteConn.createConnection(this.dbName, false, "no-encryption", 1);
   }
 
-  // createTables returns the number of changes were made
-  // or -1 if nothing happened
-  public async createTables(): Promise<number> {
+  public async modify(query: string, args: any[] = []): Promise<DBResult> {
     const db = await this.conn;
     await db.open();
+    let result: DBResult;
 
-    const changes = (await db.execute(`
-      CREATE TABLE IF NOT EXISTS ${this.sourcesTable} (
-        id INTEGER PRIMARY KEY NOT NULL,
-        name VARCHAR(100) NOT NULL,
-        url VARCHAR(255) NOT NULL,
-        state INTEGER NOT NULL,
-        notify INTEGER NOT NULL,
-        last_update INTEGER NOT NULL,
-        source_type VARCHAR(10) NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS ${this.feedsTable} (
-        id INTEGER PRIMARY KEY NOT NULL,
-        guid VARCHAR(100) NOT NULL,
-        title VARCHAR(255) NOT NULL,
-        author VARCHAR(50),
-        pub_date VARCHAR(20),
-        content TEXT NOT NULL,
-        source_id INTEGER NOT NULL,
-        seen INTEGER DEFAULT 0,
-        FOREIGN KEY(source_id) REFERENCES ${this.sourcesTable}(id)
-    );`)).changes;
+    try {
+      const changes = (await db.run(query, args)).changes;
 
-    //TODO: get rid of console.log
-    console.log('createTables');
-    await db.close();
-
-    if (typeof(changes) === 'number' ) {
-      return changes;
+      if (typeof(changes) === 'number' ) {
+        result = {changes: changes}
+      } else {
+        result = {changes: changes?.changes, lastId: changes?.lastId}
+      };
+    } catch (err: any) {
+      result = {err: {message: err}}
+    } finally {
+      await db.close();
     }
-    return -1;
+    
+    return result;
   }
 
-  public async getSourceByID(sourceId: number): Promise<any> {
+  public async select(query: string): Promise<DBResult> {
     const db = await this.conn;
     await db.open();
+    let result: DBResult;
 
-    const query = `
-    SELECT * FROM ${this.sourcesTable}
-    WHERE id=${sourceId}`;
-    const data = (await db.query(query)).values;
-
-    await db.close();
-
-    if (data) {
-      return data;
+    try {
+      const resp = (await db.query(query)).values
+      result = {data: resp}
+    } catch (err: any) {
+      result = {err: {message: err}}
+    } finally {
+      await db.close();
     }
-    return null;
+
+    return result;
   }
-
-  // TODO: add offset as parameter for pagination
-  public async getAllSources(): Promise<Source[]> {
-    const db = await this.conn;
-    await db.open();
-
-    const query = `SELECT * FROM ${this.sourcesTable}`;
-    const data = (await db.query(query)).values;
-
-    await db.close();
-    if (data) {
-      return data
-    }
-    return []
-  }
-
-  // TODO: make it UPSERT
-  public async updateSource(source: Source): Promise<number> {
-    const db = await this.conn;
-    await db.open();
-    const updated = (await db.execute(`
-      UPDATE
-        ${this.sourcesTable}
-      SET
-        name='${source.name}',
-        url='${source.url}',
-        last_update=${source.last_update},
-        notify=${source.notify},
-        state=${source.state}
-      WHERE
-        id=${source.id}`)).changes;
-
-    await db.close();
-
-      if (typeof(updated) === 'number') {
-        return updated;
-      }
-      return -1;
-  }
-
-  public async deleteSourceByID(sourceId: number): Promise<number> {
-    const db = await this.conn;
-    await db.open();
-
-    const deleted = (
-      await db.execute(`DELETE FROM ${this.sourcesTable} WHERE id=${sourceId}`)
-    ).changes;
-
-    await db.close();
-
-    if (typeof(deleted) === 'number') {
-      return deleted;
-    }
-    return -1;
-  }
-
-  public async insertSource(source: Source): Promise<number> {
-    //console.log(source)
-    const db = await this.conn;
-    await db.open();
-    const query = `
-      INSERT INTO
-        ${this.sourcesTable} (name, url, state, notify, last_update, source_type)
-      VALUES (
-        '${source.name}',
-        '${source.url}',
-        ${source.state},
-        ${source.notify},
-        ${source.last_update},
-        '${source.source_type}'
-      )
-      RETURNING id`;
-    const lastId = (await db.run(query)).changes?.lastId;
-
-    await db.close();
-
-    if (lastId) {
-      return  lastId;
-    }
-    return -1;
-  }
-
-  public async insertFeed(feed: Feed, src_id: number): Promise<number> {
-    const db = await this.conn;
-    await db.open();
-
-    const query = `
-    INSERT INTO ${this.feedsTable}
-    (
-      guid,
-      title,
-      author,
-      pub_date,
-      content,
-      source_id
-    )
-    VALUES (
-      "${feed.guid}",
-      "${feed.title}",
-      "${feed.author}",
-      "${feed.pub_date}",
-      "${feed.content}",
-      ${src_id}
-    );`;
-
-    const lastId = (await db.run(query)).changes?.lastId;
-
-    db.close();
-
-    if (lastId) {
-      return lastId;
-    }
-    return -1;
-  }
-
-  public async getAllFeeds(): Promise<Feed[]> {
-    const query = `SELECT * FROM ${this.feedsTable}`
-    const db = await this.conn;
-    await db.open();
-
-    const feeds = (await db.query(query)).values;
-
-
-    await db.close();
-    if (feeds) {
-      return feeds
-    }
-    return []
-  }
-
 }
