@@ -25,7 +25,7 @@ const INIT = `
       content TEXT NOT NULL,
       source_id INTEGER NOT NULL,
       seen INTEGER DEFAULT 0,
-      FOREIGN KEY(source_id) REFERENCES ${FEEDS_TABLE}(id)`;
+      FOREIGN KEY(source_id) REFERENCES ${SOURCES_TABLE}(id)`;
 
 // init creates new tables in database
 async function init() {
