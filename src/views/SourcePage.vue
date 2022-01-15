@@ -5,10 +5,10 @@
       <ion-grid>
         <ion-row>
           <ion-col size='10'>
-            <ion-input type='url' v-model='sourceUrl' placeholder='Source URL'></ion-input>
+            <ion-input type='url' v-model='url' placeholder='Source URL'></ion-input>
           </ion-col>
           <ion-col size='2' class='add-source-icon'>
-            <ion-icon @click='() => addSource(sourceUrl)'
+            <ion-icon @click='dummyPlug("add source")'
                       size='large'
                       src='assets/icons/arrow-down-circle-outline.svg'>
             </ion-icon>
@@ -18,7 +18,7 @@
     </ion-item>
     <ion-content :fullscreen='false' class='content'>
       <ion-grid>
-        <ion-row class='content'  :key='source.index' v-for='source in sources'>
+        <ion-row class='content'  :key='source.id' v-for='source in sources'>
 
           <ion-col size='7' class='source-name-container'>
             <div>
@@ -28,7 +28,7 @@
 
           <ion-col size='3' class='source-name-container'>
             <div>
-              <ion-toggle @ionChange='toggleNotificationState($event, source)' :checked='source.notify'></ion-toggle>
+              <ion-toggle @ionChange='dummyPlug("toggle")' :checked='source.notify'></ion-toggle>
             </div>
           </ion-col>
 
@@ -36,7 +36,7 @@
             <div class=''>
               <ion-icon size='large'
                         src='assets/icons/close-outline.svg'
-                        @click='removeSourceByID(source.id)'>
+                        @click='dummyPlug("remove")'>
             </ion-icon>
             </div>
           </ion-col>
@@ -63,7 +63,7 @@ import {
   IonToggle
 } from '@ionic/vue';
 
-import { useSources } from '@/services/rss.service';
+import { useSources } from '@/services/sources.service';
 
 export default defineComponent({
   components: {
@@ -80,24 +80,17 @@ export default defineComponent({
 
   setup() {
 
-    const {
-      sources,
-      sourceUrl,
-      addSource,
-      setSources,
-      removeSourceByID,
-      toggleNotificationState
-    } = useSources();
+    const { sources, setSources, url } = useSources();
+    const dummyPlug = (msg: string) => console.log(msg);
 
     // call set sources to update them when created
     setSources();
 
     return {
-      sourceUrl,
+      url,
       sources,
-      addSource,
-      removeSourceByID,
-      toggleNotificationState
+      setSources,
+      dummyPlug
     }
   },
 });

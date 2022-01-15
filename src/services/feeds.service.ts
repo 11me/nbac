@@ -52,7 +52,7 @@ async function getFeeds() {
     // insert feed to db
   });
     fetchedFeeds.forEach(async (feed: any, i: number) => {
-      await addFeed(feed, sources[i].id)
+      console.log(1)
     });
     await setFeeds();
 }
