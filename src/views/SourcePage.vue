@@ -8,7 +8,7 @@
             <ion-input type='url' v-model='url' placeholder='Source URL'></ion-input>
           </ion-col>
           <ion-col size='2' class='add-source-icon'>
-            <ion-icon @click='dummyPlug("add source")'
+            <ion-icon @click='addSource(url)'
                       size='large'
                       src='assets/icons/arrow-down-circle-outline.svg'>
             </ion-icon>
@@ -80,7 +80,9 @@ export default defineComponent({
 
   setup() {
 
-    const { sources, setSources, url } = useSources();
+    const { url, sources, setSources, addSource } = useSources();
+
+    //TODO: delete me
     const dummyPlug = (msg: string) => console.log(msg);
 
     // call set sources to update them when created
@@ -90,6 +92,7 @@ export default defineComponent({
       url,
       sources,
       setSources,
+      addSource,
       dummyPlug
     }
   },

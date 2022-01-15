@@ -13,9 +13,9 @@ export interface Source {
   id?:          number
   name:         string
   url:          string
-  last_update:  number
-  notify:       number
-  state:        number
+  last_update?:  number
+  notify?:       number
+  state?:        number
   source_type:  string
 }
 
@@ -28,4 +28,9 @@ export interface DBResult {
   changes?: number
   lastId?: number
   data?: any[]
+}
+
+export interface FetchResult {
+  data?: any[] | any
+  err?: Err
 }
