@@ -28,13 +28,13 @@ const INIT = `
       FOREIGN KEY(source_id) REFERENCES ${SOURCES_TABLE}(id)`;
 
 // init creates new tables in database
-async function init() {
+export async function init() {
   //TODO: implement
 }
 
 //** logic related to sources //
 
-async function insertSource(source: Source): Promise<DBResult> {
+export async function insertSource(source: Source): Promise<DBResult> {
 
   const sqlcmd = `INSERT INTO ${SOURCES_TABLE}
   (
@@ -63,7 +63,7 @@ async function insertSource(source: Source): Promise<DBResult> {
   }
 }
 
-async function getSources(): Promise<DBResult> {
+export async function getSources(): Promise<DBResult> {
   const query = `SELECT * FROM ${SOURCES_TABLE}`;
 
   //TODO: implement a call
@@ -83,7 +83,7 @@ async function getSources(): Promise<DBResult> {
   }
 }
 
-async function updateSource(source: Source): Promise<DBResult> {
+export async function updateSource(source: Source): Promise<DBResult> {
   const sqlcmd = `
   UPDATE ${SOURCES_TABLE} s
   SET
