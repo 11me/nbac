@@ -69,7 +69,6 @@ async function getSources(): Promise<DBResult> {
   //TODO: implement a call
 
   return {
-    err: undefined,
     data: [
       {
         id: 1,
