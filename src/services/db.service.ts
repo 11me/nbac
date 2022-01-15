@@ -1,7 +1,8 @@
 // Dabatase service incapsultes methods
 // to communicate with SQLiteDBSession.
-
 import { Source, Feed, Err, DBResult } from '@/models';
+import session from '@/main'
+
 
 const SOURCES_TABLE = 'sources';
 const FEEDS_TABLE   = 'feeds';
@@ -25,11 +26,11 @@ const INIT = `
       content TEXT NOT NULL,
       source_id INTEGER NOT NULL,
       seen INTEGER DEFAULT 0,
-      FOREIGN KEY(source_id) REFERENCES ${SOURCES_TABLE}(id)`;
+      FOREIGN KEY(source_id) REFERENCES ${SOURCES_TABLE}(id))`;
 
 // init creates new tables in database
-export async function init() {
-  //TODO: implement
+export async function init(): Promise<void> {
+  await session.modify(INIT);
 }
 
 //** logic related to sources //
@@ -51,36 +52,18 @@ export async function insertSource(source: Source): Promise<DBResult> {
   const values = [
     source.name,
     source.url,
-    Date.now(),
+    Date.now().toString(),
     1,
     1,
     source.source_type
   ];
-  //TODO: implement a call to session
-  return {
-    changes: 1,
-    lastId: 1
-  }
+  return await session.modify(sqlcmd, values);
 }
+
 
 export async function getSources(): Promise<DBResult> {
   const query = `SELECT * FROM ${SOURCES_TABLE};`;
-
-  //TODO: implement a call
-
-  return {
-    data: [
-      {
-        id: 1,
-        name: 'BBC News',
-        url: 'http://example.com',
-        last_update: Date.now(),
-        notify: 1,
-        state: 1,
-        source_type: 'rss'
-      }
-    ]
-  }
+  return await session.select(query);
 }
 
 export async function updateSource(source: Source): Promise<DBResult> {
@@ -93,38 +76,18 @@ export async function updateSource(source: Source): Promise<DBResult> {
     s.id = ?;`;
 
   const values = [
-    Date.now(),
+    Date.now().toString(),
     source.state,
     source.id
   ];
-
-  //TODO: implement
-  return {
-    changes: 1
-  }
+  return await session.modify(sqlcmd, values);
 }
 
 //** logic related to feeds //
 
 export async function getFeeds(): Promise<DBResult> {
   const query = `SELECT * FROM ${FEEDS_TABLE};`;
-
-  //TODO...
-  //
-  return {
-    data: [
-      {
-        id: 1,
-        guid: 'skxksi',
-        title: 'Feed title',
-        author: 'Aristotel',
-        pub_date: Date.now(),
-        content: 'Some long content',
-        source_id: 1,
-        seen: 1
-      }
-    ]
-  }
+  return await session.select(query);
 }
 
 export async function insertFeed(feed: Feed, src_id: number): Promise<DBResult> {
@@ -153,7 +116,5 @@ export async function insertFeed(feed: Feed, src_id: number): Promise<DBResult> 
     src_id
   ];
 
-  return {
-    lastId: 1
-  }
+  return await session.modify(sqlcmd, values);
 }
