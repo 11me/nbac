@@ -45,7 +45,8 @@ async function insertSource(source: Source): Promise<DBResult> {
     state,
     source_type
   )
-  VALUES (?,?,?,?,?,?)`;
+  VALUES (?,?,?,?,?,?)
+  RETURNING id;`;
 
   const values = [
     source.name,
@@ -58,6 +59,7 @@ async function insertSource(source: Source): Promise<DBResult> {
   //TODO: implement a call to session
   return {
     changes: 1,
+    lastId: 1
   }
 }
 
@@ -79,5 +81,26 @@ async function getSources(): Promise<DBResult> {
         source_type: 'rss'
       }
     ]
+  }
+}
+
+async function updateSource(source: Source): Promise<DBResult> {
+  const sqlcmd = `
+  UPDATE ${SOURCES_TABLE} s
+  SET
+    last_update = ?,
+    state = ?
+  WHERE
+    s.id = ?;`;
+
+  const values = [
+    Date.now(),
+    source.state,
+    source.id
+  ]
+
+  //TODO: implement
+  return {
+    changes: 1
   }
 }
