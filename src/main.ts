@@ -31,6 +31,8 @@ import './theme/nbac.css';
 
 import { defineCustomElements as jeepSqlite, applyPolyfills} from 'jeep-sqlite/loader';
 import SQLiteSession from '@/services/session';
+import { init } from '@/services/db.service'
+
 
 applyPolyfills().then(() => {
     jeepSqlite(window);
@@ -38,9 +40,8 @@ applyPolyfills().then(() => {
 
 const session = new SQLiteSession('db_tab3SQLite');
 
-session.createTables()
-
 export default session
+init()
 
 /* register fa-icons */
 faIcons.add(faPaperPlane);
