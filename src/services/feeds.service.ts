@@ -39,22 +39,22 @@ async function addFeed(feed: Feed, src_id: number) {
     seen: 0
   }
     await session.insertFeed(constructedFeed, src_id);
-    await setFeeds();
 }
 
 async function getFeeds() {
   // retrieve all sources from DB
   const sources = await session.getAllSources();
-
+  let fetchedFeeds: any = [];
   // for each source retrieve the feed
   sources.forEach(async source => {
     // fetch feeds
-     const fetchedFeeds = await fetchFeeds(source.url);
+     fetchedFeeds = await fetchFeeds(source.url);
     // insert feed to db
-    fetchedFeeds.forEach(async feed => {
-      await addFeed(feed, source.id)
-    });
   });
+    fetchedFeeds.forEach(async (feed: any, i: number) => {
+      await addFeed(feed, sources[i].id)
+    });
+    await setFeeds();
 }
 
 export function useFeeds() {

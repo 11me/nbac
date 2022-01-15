@@ -203,11 +203,11 @@ export default class SQLiteSession {
       source_id
     )
     VALUES (
-      ${feed.guid},
-      ${feed.title},
-      ${feed.author},
-      ${feed.pub_date},
-      ${feed.content},
+      "${feed.guid}",
+      "${feed.title}",
+      "${feed.author}",
+      "${feed.pub_date}",
+      "${feed.content}",
       ${src_id}
     );`;
 
