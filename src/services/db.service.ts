@@ -68,16 +68,16 @@ export async function getSources(): Promise<DBResult> {
 
 export async function updateSource(source: Source): Promise<DBResult> {
   const sqlcmd = `
-  UPDATE ${SOURCES_TABLE} s
+  UPDATE ${SOURCES_TABLE}
   SET
     last_update = ?,
-    state = ?
+    notify = ?
   WHERE
-    s.id = ?;`;
+    id = ?;`;
 
   const values = [
-    Date.now().toString(),
-    source.state,
+    Date.now(),
+    source.notify,
     source.id
   ];
   return await session.modify(sqlcmd, values);

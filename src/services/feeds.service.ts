@@ -1,4 +1,3 @@
-import session from "@/main";
 import { Options, sources, Feed, RSSParser } from "@11me/xparse";
 import { Feed as FeedModel } from '@/models';
 import { Http } from '@capacitor-community/http';
@@ -8,7 +7,7 @@ const feeds = ref<FeedModel[]>([]);
 
 // TODO: make this function generic
 async function setFeeds() {
-  feeds.value = await session.getAllFeeds();
+  console.log('set feeds');
 }
 
 // TODO: make this function generic and place into helpers
@@ -20,41 +19,17 @@ async function fetchProvider(url: string) {
 //TODO: make parser composable
 const rssParser = new RSSParser(fetchProvider);
 
-async function fetchFeeds(url: string): Promise<Feed[]> {
-  const feeds = await rssParser.parse(url);
-  return feeds;
+async function fetchFeeds(url: string) {
+  console.log('fetch feeds');
 }
 
 // addFeed adds feeds to database when user updates feeds page
 async function addFeed(feed: Feed, src_id: number) {
-
-  const constructedFeed = {
-    id: 0,
-    guid: 'random',
-    title: feed.title,
-    author: feed.author,
-    pub_date: feed.pubDate,
-    content: feed.description,
-    source_id: src_id,
-    seen: 0
-  }
-    await session.insertFeed(constructedFeed, src_id);
+  console.log('add feeds');
 }
 
 async function getFeeds() {
-  // retrieve all sources from DB
-  const sources = await session.getAllSources();
-  let fetchedFeeds: any = [];
-  // for each source retrieve the feed
-  sources.forEach(async source => {
-    // fetch feeds
-     fetchedFeeds = await fetchFeeds(source.url);
-    // insert feed to db
-  });
-    fetchedFeeds.forEach(async (feed: any, i: number) => {
-      console.log(1)
-    });
-    await setFeeds();
+  console.log('get feeds');
 }
 
 export function useFeeds() {
