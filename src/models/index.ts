@@ -34,3 +34,9 @@ export interface FetchResult {
   data?: any[] | any
   err?:  Err
 }
+
+
+export interface Alert {
+  SelectSQL: string,
+  TypeErr: string
+}
