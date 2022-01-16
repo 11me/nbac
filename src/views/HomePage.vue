@@ -15,7 +15,7 @@
         Subscribe to web-sites rss feed you want to read
       </p>
     </div>
-    <nbac-button linkTo="/source">Add links</nbac-button>
+    <nbac-button linkTo="/sources">Add links</nbac-button>
   </div>
 </template>
 

@@ -6,7 +6,7 @@ import { IonicVue } from '@ionic/vue';
 
 /* fontawesome icons */
 import { library as faIcons } from '@fortawesome/fontawesome-svg-core';
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import { faPaperPlane, faArrowDown, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 /* Core CSS required for Ionic components to work properly */
@@ -44,7 +44,9 @@ export default session
 init()
 
 /* register fa-icons */
-faIcons.add(faPaperPlane);
+faIcons.add(faPaperPlane,
+            faArrowDown,
+            faTimes);
 
 const app = createApp(App)
   .component('font-awesome-icon', FontAwesomeIcon)

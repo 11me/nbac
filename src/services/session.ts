@@ -66,13 +66,13 @@ export default class SQLiteSession {
         result = {changes: changes}
       } else {
         result = {changes: changes?.changes, lastId: changes?.lastId}
-      };
+      }
     } catch (err: any) {
       result = {err: {message: err}}
     } finally {
       await db.close();
     }
-    
+
     return result;
   }
 

@@ -10,13 +10,13 @@ export interface Feed {
 }
 
 export interface Source {
-  id?:          number
-  name:         string
-  url:          string
+  id?:           number
+  name:          string
+  url:           string
   last_update?:  number
   notify?:       number
   state?:        number
-  source_type:  string
+  source_type:   string
 }
 
 export interface Err {
@@ -26,11 +26,11 @@ export interface Err {
 export interface DBResult {
   err?: Err
   changes?: number
-  lastId?: number
-  data?: any[]
+  lastId?:  number
+  data?:    any[]
 }
 
 export interface FetchResult {
   data?: any[] | any
-  err?: Err
+  err?:  Err
 }
