@@ -20,7 +20,7 @@ const routes: Array<RouteRecordRaw> = [
     component: FeedsPage
   },
   {
-    path: '/source',
+    path: '/sources',
     name: 'SourcePage',
     component: SourcePage
   }
