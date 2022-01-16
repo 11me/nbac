@@ -1,6 +1,7 @@
 <template>
   <div class="source_page-container">
     <h1>Sources</h1>
+    <AlertComponent></AlertComponent>
     <div class="source_page-input">
       <input type="text" v-model="url">
       <button @click="addSource(url)">
@@ -36,9 +37,11 @@
 <script lang="ts">
 import { useSources } from '@/services/sources.service';
 import { defineComponent, ref } from 'vue';
+import AlertComponent from '../components/Alert.vue';
 
 export default defineComponent({
   components: {
+    AlertComponent
   },
 
   setup() {
