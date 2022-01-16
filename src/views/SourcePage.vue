@@ -106,9 +106,14 @@ export default defineComponent({
   background-color: #fff;
   border: thin solid var(--nbac-color-grey);
   color: var(--nbac-color-grey);
+  transition: all 0.3s ease-in-out;
 }
 .source_page-input button:focus {
   outline: none;
+}
+.source_page-input button:active {
+  outline: none;
+  background-color: var(--nbac-color-grey);
 }
 .source_page-source-item {
   display: flex;
