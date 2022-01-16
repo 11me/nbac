@@ -14,10 +14,10 @@
         <span class="source_page-source-item-text">{{ source.name }}</span>
         <div class="source_page-toggle-wrapper">
 
-          <label class="source_page-toggle" for="myToggle">
+          <label class="source_page-toggle" :for="source.id">
               <input class="source_page-toggle_input"
                      type="checkbox"
-                     id="myToggle"
+                     :id="source.id"
                      :checked="source.notify"
                      @change="toggleSourceNotification(source)">
               <div class="source_page-toggle_fill"></div>
