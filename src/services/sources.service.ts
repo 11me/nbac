@@ -6,7 +6,8 @@ import { Err, Source, FetchResult } from '@/models';
 import {
   getSources,
   insertSource,
-  updateSource
+  updateSource,
+  deleteSource
 } from '@/services/db.service';
 
 // user input url
@@ -72,13 +73,25 @@ async function toggleSourceNotification(src: Source) {
 
 }
 
+async function removeSource(source: Source) {
+  const res = await deleteSource(source);
+
+  if (res.err) {
+    //TODO: show alert
+    console.log(res.err.message);
+    return
+  }
+  await setSources();
+}
+
 export function useSources() {
   return {
     url,
     sources,
     setSources,
     addSource,
-    toggleSourceNotification
+    toggleSourceNotification,
+    removeSource
   }
 }
 

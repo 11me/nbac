@@ -85,6 +85,14 @@ export async function updateSource(source: Source): Promise<DBResult> {
   return await session.modify(sqlcmd, values);
 }
 
+export async function deleteSource(source: Source) {
+  const query = `
+    DELETE FROM ${SOURCES_TABLE}
+    WHERE id = ${source.id};`;
+
+    return await session.modify(query);
+}
+
 //** logic related to feeds //
 
 export async function getFeeds(): Promise<DBResult> {

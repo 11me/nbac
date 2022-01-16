@@ -23,7 +23,7 @@
               <div class="source_page-toggle_fill"></div>
           </label>
 
-          <button class="source_page-button-remove">
+          <button @click="removeSource(source)" class="source_page-button-remove">
             <font-awesome-icon icon="times" size="lg" />
           </button>
         </div>
@@ -48,7 +48,8 @@ export default defineComponent({
       sources,
       setSources,
       addSource,
-      toggleSourceNotification } = useSources();
+      toggleSourceNotification,
+      removeSource } = useSources();
 
     //TODO: delete me
     function dummyPlug(msg: any) {
@@ -64,7 +65,8 @@ export default defineComponent({
       setSources,
       addSource,
       toggleSourceNotification,
-      dummyPlug
+      removeSource,
+      dummyPlug,
     }
   },
 });
