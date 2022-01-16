@@ -38,21 +38,26 @@ applyPolyfills().then(() => {
     jeepSqlite(window);
 });
 
+
 const session = new SQLiteSession('db_tab3SQLite');
 
-export default session
-init()
+window.addEventListener('DOMContentLoaded', async () => {
 
-/* register fa-icons */
-faIcons.add(faPaperPlane,
-            faArrowDown,
-            faTimes);
+  await init();
 
-const app = createApp(App)
-  .component('font-awesome-icon', FontAwesomeIcon)
-  .use(IonicVue)
-  .use(router);
+  /* register fa-icons */
+  faIcons.add(faPaperPlane,
+              faArrowDown,
+              faTimes);
 
-router.isReady().then(() => {
-  app.mount('#app');
+  const app = createApp(App)
+    .component('font-awesome-icon', FontAwesomeIcon)
+    .use(IonicVue)
+    .use(router);
+
+  router.isReady().then(() => {
+    app.mount('#app');
+  });
+
 });
+export default session
