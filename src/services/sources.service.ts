@@ -2,7 +2,7 @@
 
 import { ref } from 'vue';
 import { parseSource } from '@/services/parser.service';
-import { Err, Source, FetchResult } from '@/models';
+import { Err, Source } from '@/models';
 import {
   getSources,
   insertSource,
