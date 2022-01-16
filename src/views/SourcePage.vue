@@ -2,8 +2,10 @@
   <div class="source_page-container">
     <h1>Sources</h1>
     <div class="source_page-input">
-      <input type="text">
-      <button><font-awesome-icon icon="arrow-down" size="xs" /></button>
+      <input type="text" v-model="url">
+      <button @click="addSource(url)">
+        <font-awesome-icon icon="arrow-down" size="xs" />
+      </button>
     </div>
 
     <div class="source_page-sources">
@@ -102,6 +104,9 @@ export default defineComponent({
   background-color: #fff;
   border: thin solid var(--nbac-color-grey);
   color: var(--nbac-color-grey);
+}
+.source_page-input button:focus {
+  outline: none;
 }
 .source_page-source-item {
   display: flex;

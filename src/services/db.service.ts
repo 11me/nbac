@@ -15,7 +15,8 @@ const INIT = `
       state INTEGER NOT NULL,
       notify INTEGER NOT NULL,
       last_update INTEGER NOT NULL,
-      source_type VARCHAR(10) NOT NULL
+      source_type VARCHAR(10) NOT NULL,
+      UNIQUE(url)
   );
   CREATE TABLE IF NOT EXISTS ${FEEDS_TABLE} (
       id INTEGER PRIMARY KEY NOT NULL,
@@ -26,6 +27,7 @@ const INIT = `
       content TEXT NOT NULL,
       source_id INTEGER NOT NULL,
       seen INTEGER DEFAULT 0,
+      UNIQUE(guid),
       FOREIGN KEY(source_id) REFERENCES ${SOURCES_TABLE}(id))`;
 
 // init creates new tables in database

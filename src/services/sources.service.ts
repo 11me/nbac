@@ -2,13 +2,14 @@
 
 import { ref } from 'vue';
 import { parseSource } from '@/services/parser.service';
-import { Err, Source } from '@/models';
+import { Err, Source, FetchResult } from '@/models';
 import {
   getSources,
   insertSource,
   updateSource
 } from '@/services/db.service';
 
+// user input url
 const url = ref<string>('');
 const sources = ref<any[]>([]);
 
@@ -29,16 +30,30 @@ async function setSources() {
 }
 
 async function addSource(url: string) {
-  const source = await parseSource(url);
 
-  const res = await insertSource(source.data);
-  if (res.err) {
-    //TODO: show alert
-    console.log(res.err.message);
-    return
+  if (url) {
+
+    const source = await parseSource(url);
+
+    if (source.err) {
+      //TODO: show alert
+      console.log(source.err.message);
+      return
+    }
+
+    const res = await insertSource({
+      ...source.data,
+      url //override url to user input url
+    });
+
+    if (res.err) {
+      //TODO: show alert
+      console.log(res.err.message);
+      return
+    }
+    // if no errors
+    await setSources();
   }
-  // if no errors
-  await setSources();
 }
 
 async function toggleSourceNotification(src: Source) {
