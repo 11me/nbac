@@ -1,28 +1,41 @@
-import { HTMLParser, Options, Feed, sources } from "@11me/xparse";
+import { Options, sources, Feed, RSSParser } from "@11me/xparse";
+import { Feed as FeedModel } from '@/models';
 import { Http } from '@capacitor-community/http';
 import { ref } from "vue";
 
-const feeds = ref<Feed[]>();
+const feeds = ref<FeedModel[]>([]);
 
-const debugURL = 'http://70.34.217.128:8888/thehackernews.com'
+// TODO: make this function generic
+async function setFeeds() {
+  console.log('set feeds');
+}
 
+// TODO: make this function generic and place into helpers
 async function fetchProvider(url: string) {
-  const resource = await Http.get({url})
-  return resource.data
+  const resource = await Http.get({url});
+  return resource.data;
 }
 
-sources.thehackernews.description.url = debugURL;
-const htmlParser = new HTMLParser(fetchProvider);
+//TODO: make parser composable
+const rssParser = new RSSParser(fetchProvider);
 
-async function getFeeds(options: Options) {
-  feeds.value = await htmlParser.parse(options);
+async function fetchFeeds(url: string) {
+  console.log('fetch feeds');
 }
 
-getFeeds(sources.thehackernews);
+// addFeed adds feeds to database when user updates feeds page
+async function addFeed(feed: Feed, src_id: number) {
+  console.log('add feeds');
+}
+
+async function getFeeds() {
+  console.log('get feeds');
+}
 
 export function useFeeds() {
   return {
     feeds,
-    getFeeds
+    getFeeds,
+    addFeed,
   }
 }

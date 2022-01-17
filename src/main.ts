@@ -4,6 +4,11 @@ import router from './router';
 
 import { IonicVue } from '@ionic/vue';
 
+/* fontawesome icons */
+import { library as faIcons } from '@fortawesome/fontawesome-svg-core';
+import { faPaperPlane, faArrowDown, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
 
@@ -23,33 +28,36 @@ import '@ionic/vue/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 import './theme/nbac.css';
-import { defineCustomElements as jeepSqlite, applyPolyfills} from 'jeep-sqlite/loader'
+
+import { defineCustomElements as jeepSqlite, applyPolyfills} from 'jeep-sqlite/loader';
 import SQLiteSession from '@/services/session';
+import { init } from '@/services/db.service'
+
 
 applyPolyfills().then(() => {
     jeepSqlite(window);
 });
 
-const session = new SQLiteSession('db_tab3SQLite')
 
-session.execute(`
-  CREATE TABLE IF NOT EXISTS trd_sources (
-    id INTEGER PRIMARY KEY NOT NULL,
-    name TEXT NOT NULL,
-    url TEXT NOT NULL,
-    state INTEGER NOT NULL,
-    notifications INTEGER NOT NULL,
-    last_update INTEGER NOT NULL
-);`)
+const session = new SQLiteSession('db_tab3SQLite');
 
-export default session
+window.addEventListener('DOMContentLoaded', async () => {
 
-const app = createApp(App)
-  .use(IonicVue)
-  .use(router);
+  await init();
 
+  /* register fa-icons */
+  faIcons.add(faPaperPlane,
+              faArrowDown,
+              faTimes);
 
+  const app = createApp(App)
+    .component('font-awesome-icon', FontAwesomeIcon)
+    .use(IonicVue)
+    .use(router);
 
-router.isReady().then(() => {
-  app.mount('#app');
+  router.isReady().then(() => {
+    app.mount('#app');
+  });
+
 });
+export default session

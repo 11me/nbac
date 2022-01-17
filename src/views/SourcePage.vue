@@ -1,143 +1,188 @@
 <template>
-  <ion-page style='padding-right:5%; padding-top: 14%'>
-    <h1 style="margin: 0; margin-left: 8%">Sources</h1>
-    <ion-item>
-      <ion-grid>
-        <ion-row>
-          <ion-col size="10">
-            <ion-input type="email" v-model='sourceUrl' placeholder='Correct source'></ion-input>
-          </ion-col>
-          <ion-col size="2" class="add-source-icon">
-            <ion-icon @click="addSource"
-                      size="large"
-                      src="assets/icons/arrow-down-circle-outline.svg">
-            </ion-icon>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-item>
-    <ion-content :fullscreen="false" class='content'>
-      <ion-grid>
-        <ion-row class='content'  :key="source.index" v-for="source in inDb">
+  <div class="source_page-container">
+    <h1>Sources</h1>
+    <div class="source_page-input">
+      <input type="text" v-model="url">
+      <button @click="addSource(url)">
+        <font-awesome-icon icon="arrow-down" size="xs" />
+      </button>
+    </div>
 
-          <ion-col size="7" class="source-name-container">
-            <div class="">
-              <p class="source-name">{{ source.name }}</p>
-            </div>
-          </ion-col>
+    <div class="source_page-sources">
 
-          <ion-col size="3" class="source-name-container">
-            <div class="">
-              <ion-toggle @ionChange="changeNotifications($event, source.id)" :checked="source.notifications"></ion-toggle>
-            </div>
-          </ion-col>
+      <div v-for="source in sources" :key="source.id" class="source_page-source-item">
+        <span class="source_page-source-item-text">{{ source.name }}</span>
+        <div class="source_page-toggle-wrapper">
 
-          <ion-col size="2" class="source-name-container">
-            <div class="">
-              <ion-icon size="large"
-                        src="assets/icons/close-outline.svg"
-                        @click="removeSource(source.id)">
-            </ion-icon>
-            </div>
-          </ion-col>
+          <label class="source_page-toggle" :for="source.id">
+              <input class="source_page-toggle_input"
+                     type="checkbox"
+                     :id="source.id"
+                     :checked="source.notify"
+                     @change="toggleSourceNotification(source)">
+              <div class="source_page-toggle_fill"></div>
+          </label>
 
-        </ion-row>
-      </ion-grid>
-    </ion-content>
-    <p style="margin-left: 8%; margin-top: 15%; margin-bottom: 15%">Please turn on notifications  in settings</p>
-  </ion-page>
+          <button @click="removeSource(source)" class="source_page-button-remove">
+            <font-awesome-icon icon="times" size="lg" />
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
-import { IonContent,
-         IonPage,
-         IonLabel,
-         IonInput,
-         IonCol,
-         IonGrid,
-         IonIcon,
-         IonRow,
-         IonItem,
-         IonToggle} from '@ionic/vue';
-import { defineComponent } from 'vue';
-  import { isRSS } from '@/services/helpers';
-  import { HTMLParser, sources, Options } from '@11me/xparse';
+import { useSources } from '@/services/sources.service';
+import { defineComponent, ref } from 'vue';
 
-  import session from '@/main';
-
-  export default defineComponent({
-    components: {
-      IonContent,
-      IonPage,
-      IonCol,
-      IonIcon,
-      IonGrid,
-      IonRow,
-      IonToggle,
-      IonItem,
-      IonInput,
+export default defineComponent({
+  components: {
   },
-  data() {
+
+  setup() {
+
+    const {
+      url,
+      sources,
+      setSources,
+      addSource,
+      toggleSourceNotification,
+      removeSource } = useSources();
+
+    //TODO: delete me
+    function dummyPlug(msg: any) {
+      console.log(msg);
+    }
+
+    // call set sources to update them when created
+    setSources();
+
     return {
-      inDb: [] as never[],
-      sourceUrl: ''
+      url,
+      sources,
+      setSources,
+      addSource,
+      toggleSourceNotification,
+      removeSource,
+      dummyPlug,
     }
   },
-  async created() {
-    this.inDb = await session.query('SELECT * FROM trd_sources')
-  },
-  methods: {
-    async changeNotifications(change: any, sourceId: number) {
-       if (change.detail.checked) {
-         await session.execute(`UPDATE trd_sources SET notifications=1 WHERE id=${sourceId}`);
-       } else {
-         await session.execute(`UPDATE trd_sources SET notifications=0 WHERE id=${sourceId}`);
-       }
-       this.inDb = await session.query('SELECT * FROM trd_sources');
-    },
-    async removeSource(sourceId: number) {
-      await session.execute(`DELETE FROM trd_sources WHERE id=${sourceId}`);
-      this.inDb = await session.query('SELECT * FROM trd_sources')
-    },
-    async addSource() {
-      let options = {
-        name: 'Bloomberg',
-        url: 'vc.ru',
-        state: 1,
-        notifications: 1,
-        last_update: 100000
-      }
-      if (isRSS(this.sourceUrl)) {
-        let query = `
-          INSERT INTO
-            trd_sources (name, url, state, notifications, last_update)
-          VALUES (
-            '${options.name}', '${options.url}', ${options.state},
-            ${options.notifications}, ${options.last_update}
-          )`
-        await session.execute(query);
-        this.inDb = await session.query('SELECT * FROM trd_sources');
-      } else {
-        console.log('not')
-      }
-    }
-  }
 });
+
 </script>
 
-<style scoped>
-.add-source-icon {
-  text-align: end !important
+<style>
+.source_page-container {
+  padding: 80px 30px 10px 30px;
+  width: 100%;
 }
-.content {
-  padding-left: 6.5% !important
+.source_page-container h1 {
+  font-size: 42px;
+  font-weight: 700;
+}
+.source_page-input {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.source_page-input input, input:focus, input:active {
+  display: block;
+  width: 100%;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+  border-bottom: thin solid var(--nbac-color-grey);
+  outline: none;
+  color: var(--nbac-color-grey);
+  font-size: 18px;
+  line-height: 27px;
+}
+.source_page-input button {
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  background-color: #fff;
+  border: thin solid var(--nbac-color-grey);
+  color: var(--nbac-color-grey);
+  transition: all 0.3s ease-in-out;
+}
+.source_page-input button:focus {
+  outline: none;
+}
+.source_page-input button:active {
+  outline: none;
+  background-color: var(--nbac-color-grey);
+}
+.source_page-source-item {
+  display: flex;
+  margin-top: 20px;
+  justify-content: space-between;
+  align-items: center;
+}
+.source_page-source-item-text {
+  font-size: 18px;
+  font-weight: 300;
+}
+.source_page-button-remove {
+	width: 20px;
+	height: 20px;
+  padding: 0;
+  margin-left: 30px;
+  background: none;
+}
+.source_page-toggle-wrapper {
+  display: flex;
+  align-items: center;
 }
 
-.source-name {
-  margin: 0
+/** toggle element style */
+
+.source_page-toggle {
+  --width: 40px;
+  --height: calc(var(--width) / 2);
+  --border-radius: calc(var(--height) / 2);
+
+  display: inline-block;
+  cursor: pointer;
 }
 
-.source-name-container {
-  align-self: center;
+.source_page-toggle_input {
+  display: none;
 }
+
+.source_page-toggle_fill {
+  position: relative;
+  width: var(--width);
+  height: var(--height);
+  border-radius: var(--border-radius);
+  background: #dddddd;
+  transition: background 0.2s;
+}
+
+.source_page-toggle_input:checked ~ .source_page-toggle_fill {
+  background: #9EB7C2;
+}
+
+.source_page-toggle_fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: var(--height);
+  width: var(--height);
+  background: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+  border-radius: var(--border-radius);
+  transition: transform 0.2s;
+}
+
+.source_page-toggle_input:checked ~ .source_page-toggle_fill::after {
+  transform: translateX(var(--height));
+}
+.source_page-toggle_input:checked {
+  display: none;
+}
+
 </style>
