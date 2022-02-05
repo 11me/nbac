@@ -2,7 +2,8 @@
 
 import { ref } from 'vue';
 import { parseSource } from '@/services/parser.service';
-import { Err, Source } from '@/models';
+import { setAlert } from '@/services/alert.service'
+import { Err, Source, FetchResult } from '@/models';
 import {
   getSources,
   insertSource,
@@ -21,7 +22,7 @@ async function setSources() {
   // check errors
   if (res.err) {
     //TODO: show alert message
-    return
+    setAlert(res.err)
   }
   if (res.data) {
     sources.value = res.data;
@@ -39,7 +40,7 @@ async function addSource(url: string) {
     if (source.err) {
       //TODO: show alert
       console.log(source.err.message);
-      return
+      setAlert(source.err)
     }
 
     const res = await insertSource({
@@ -50,7 +51,7 @@ async function addSource(url: string) {
     if (res.err) {
       //TODO: show alert
       console.log(res.err.message);
-      return
+      setAlert(res.err)
     }
     // if no errors
     await setSources();
@@ -67,6 +68,7 @@ async function toggleSourceNotification(src: Source) {
   if (res.err) {
     //TODO: show alert
     console.log(res.err.message);
+    setAlert(res.err)
   }
   // if no errors
   await setSources();
@@ -79,7 +81,7 @@ async function removeSource(source: Source) {
   if (res.err) {
     //TODO: show alert
     console.log(res.err.message);
-    return
+    setAlert(res.err)
   }
   await setSources();
 }
