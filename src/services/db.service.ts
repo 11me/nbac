@@ -48,8 +48,7 @@ export async function insertSource(source: Source): Promise<DBResult> {
     state,
     source_type
   )
-  VALUES (?,?,?,?,?,?)
-  RETURNING id;`;
+  VALUES (?,?,?,?,?,?);`;
 
   const values = [
     source.name,
