@@ -11,7 +11,6 @@ export default defineComponent({
   name: 'AlertComponent',
   setup() {
     const alert = useAlert();
-    // const message = alert.value
     return { alert }
   }
 });
